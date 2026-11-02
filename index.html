@@ -223,8 +223,6 @@ h1 {
 .class-form textarea { resize: vertical; min-height: 84px; }
 .form-actions { display: flex; gap: 8px; }
 
-.class-edit { display: flex; align-items: center; gap: 6px; }
-.edit-ico { flex: none; color: var(--muted); }
 .btn.icon { display: grid; place-items: center; padding: 6px 8px; }
 .btn:disabled { opacity: 0.4; cursor: default; translate: none; }
 .chip.dragging { opacity: 0.4; }
@@ -236,6 +234,41 @@ h1 {
 }
 .class-edit input:hover { background: var(--surface-2); }
 .class-edit input:focus { background: var(--surface-2); border-color: var(--line); }
+
+.chip.manage { background: transparent; border-style: dashed; color: var(--muted); padding: 6px 13px; gap: 6px; }
+.chip.manage[aria-expanded="true"] { background: var(--ink); color: var(--bg); border-style: solid; }
+.mgr { display: grid; gap: 10px; padding: 12px; border-radius: 14px; background: var(--surface-2); border: 1px solid var(--line); }
+.mgr-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.mgr-head h3 { margin: 0; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.08em; color: var(--muted); }
+.mgr-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.mgr-row {
+  display: grid; grid-template-columns: 24px 24px minmax(0, 1fr) auto auto auto;
+  grid-template-areas: "grip use name up down del" ". . meta . . .";
+  align-items: center; column-gap: 4px; padding: 6px 6px 6px 2px; border-radius: 12px;
+  background: var(--surface); border: 1px solid var(--line);
+}
+.mgr-row.active { border-color: var(--ink); background: color-mix(in srgb, var(--accent) 24%, var(--surface)); }
+.mgr-row.moved { animation: moved 0.9s ease; }
+@keyframes moved { 0%, 100% { translate: 0 0; } 25% { translate: 0 -3px; box-shadow: 0 6px 14px rgba(8, 10, 40, 0.25); } }
+.mgr-row.dragging { opacity: 0.4; }
+.mgr-row.over { outline: 2px dashed var(--focus); outline-offset: 1px; }
+.mgr .ibtn { width: 30px; height: 30px; padding: 0; border: 0; border-radius: 8px; background: transparent; color: var(--muted); display: grid; place-items: center; cursor: pointer; }
+.mgr .ibtn:hover:not(:disabled) { background: var(--surface-2); color: var(--ink); }
+.mgr .ibtn:disabled { opacity: 0.3; cursor: default; }
+.mgr .ibtn.del:hover:not(:disabled) { color: var(--danger); }
+.mgr .grip { grid-area: grip; width: 24px; cursor: grab; }
+.mgr .use { grid-area: use; width: 24px; }
+.mgr .up { grid-area: up; } .mgr .down { grid-area: down; } .mgr .del { grid-area: del; }
+.radio { position: relative; width: 16px; height: 16px; border-radius: 50%; border: 2px solid var(--muted); }
+.use[aria-pressed="true"] .radio { border-color: var(--ink); }
+.use[aria-pressed="true"] .radio::after { content: ""; position: absolute; inset: 2px; border-radius: 50%; background: var(--ink); }
+.mgr-name {
+  grid-area: name; min-width: 0; width: 100%; padding: 6px 8px; border-radius: 8px;
+  border: 1px solid transparent; background: transparent; font-weight: 600; font-size: 16px;
+}
+.mgr-name:hover { background: var(--surface-2); }
+.mgr-name:focus { background: var(--surface-2); border-color: var(--line); }
+.mgr-meta { grid-area: meta; padding-left: 8px; font-size: 0.78rem; color: var(--muted); font-variant-numeric: tabular-nums; }
 
 .tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; padding: 4px; border-radius: 12px; background: var(--surface-2); }
 .tab {
@@ -449,7 +482,12 @@ h1 {
 
   <aside class="panel" id="panel" aria-label="Classes, names and tally">
     <div class="classes" id="classes" role="group" aria-label="Classes"></div>
-    <p class="note" id="class-hint">Drag a class to reorder it, or double-click it to rename. Alt + arrow keys also move the selected class.</p>
+
+    <section class="mgr" id="class-manager" aria-label="Manage classes" hidden>
+      <div class="mgr-head"><h3>Manage classes</h3><button class="btn small" id="mgr-done" type="button">Done</button></div>
+      <ul class="mgr-list" id="mgr-list"></ul>
+      <p class="note">Type in a name to rename it. Drag the grip or use the arrows to reorder. The filled circle is the class on the wheel.</p>
+    </section>
 
     <form class="class-form" id="class-form" autocomplete="off" hidden>
       <label for="class-new-name">New class name</label>
@@ -461,15 +499,6 @@ h1 {
         <button class="btn ghost" type="button" id="class-cancel">Cancel</button>
       </div>
     </form>
-
-    <div class="class-edit">
-      <label class="sr-only" for="class-name">Class name (edit to rename)</label>
-      <svg class="edit-ico" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16v4zM13.5 6.5l4 4" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></svg>
-      <input id="class-name" type="text" maxlength="40" autocomplete="off" title="Click to rename this class">
-      <button class="btn small icon" id="move-left" type="button" aria-label="Move class earlier" title="Move earlier"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
-      <button class="btn small icon" id="move-right" type="button" aria-label="Move class later" title="Move later"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
-      <button class="btn small ghost danger" id="delete-class" type="button">Delete</button>
-    </div>
 
     <div class="tabs" role="tablist" aria-label="Panel view">
       <button class="tab" role="tab" id="tabbtn-names" aria-controls="tab-names" aria-selected="true" type="button">Names <span class="count" id="count">0</span></button>
@@ -541,7 +570,7 @@ h1 {
     addInput = $('add-input'), removeToggle = $('opt-remove'), soundToggle = $('opt-sound'),
     histEl = $('history'), reveal = $('reveal'), revName = $('winner-name'),
     revNote = $('reveal-note'), btnAgain = $('again'), btnRemove = $('remove-winner'), btnClose = $('close-reveal'),
-    toastEl = $('toast'), confettiCv = $('confetti'), classForm = $('class-form'), classNameInput = $('class-name');
+    toastEl = $('toast'), confettiCv = $('confetti'), classForm = $('class-form');
   const teacher = $('teacher'), bubble = $('bubble');
 
   const SPIN_LINES = ['Somebody did not do the reading.', 'Eyes on the wheel.', 'Hmm. Somebody looks unprepared.', 'No talking while it spins.'];
@@ -871,32 +900,122 @@ h1 {
   }
 
   /* ---------- classes ---------- */
-  let dragFrom = -1;
-  function moveClass(from, to) {
+  let dragFrom = -1, movedIdx = -1;
+  const mgr = $('class-manager');
+  const ICON = {
+    grip: '<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><g fill="currentColor"><circle cx="9" cy="6" r="1.7"/><circle cx="15" cy="6" r="1.7"/><circle cx="9" cy="12" r="1.7"/><circle cx="15" cy="12" r="1.7"/><circle cx="9" cy="18" r="1.7"/><circle cx="15" cy="18" r="1.7"/></g></svg>',
+    up: '<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M5 15l7-7 7 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    down: '<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M5 9l7 7 7-7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    del: '<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M5 7h14M10 7V4h4v3M7 7l1 13h8l1-13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    pencil: '<svg viewBox="0 0 24 24" width="14" height="14" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16v4zM13.5 6.5l4 4" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/></svg>'
+  };
+  function moveClass(from, to, focusKind) {
     if (spinning || from === to || to < 0 || to >= classes.length) return;
     syncOut();
+    const act = classes[active];
     const moved = classes.splice(from, 1)[0];
     classes.splice(to, 0, moved);
-    if (active === from) active = to;
-    else if (from < active && to >= active) active -= 1;
-    else if (from > active && to <= active) active += 1;
-    renderClasses(); save();
+    active = classes.indexOf(act);
+    movedIdx = to;
+    renderClasses(); renderManager(); save();
+    if (focusKind) {
+      const row = mgr.querySelector('.mgr-row[data-i="' + to + '"]');
+      if (row) {
+        const b = row.querySelector('.' + focusKind), o = row.querySelector(focusKind === 'up' ? '.down' : '.up');
+        if (b && !b.disabled) b.focus(); else if (o && !o.disabled) o.focus();
+      }
+    }
+    setTimeout(() => { movedIdx = -1; const r = mgr.querySelector('.mgr-row.moved'); if (r) r.classList.remove('moved'); }, 900);
   }
-  function focusChip(i) { const chips = $('classes').querySelectorAll('.chip:not(.add)'); if (chips[i]) chips[i].focus(); }
-  function startRename() { classNameInput.focus(); classNameInput.select(); }
+  function deleteClassAt(idx) {
+    if (spinning) return;
+    syncOut();
+    const removed = classes[idx], act = classes[active];
+    classes.splice(idx, 1);
+    let created = false;
+    if (!classes.length) { classes.push({ name: 'Class 1', names: [], history: [] }); created = true; active = 0; }
+    else if (act === removed) active = Math.min(idx, classes.length - 1);
+    else active = classes.indexOf(act);
+    names = classes[active].names; history = classes[active].history;
+    renderAll();
+    toast('Deleted ' + (removed.name || 'class') + '.', 'Undo', () => {
+      syncOut();
+      if (created) classes.splice(0, 1);
+      classes.splice(idx, 0, removed);
+      active = classes.indexOf(act === removed || created ? removed : act);
+      names = classes[active].names; history = classes[active].history;
+      renderAll();
+    });
+  }
+  const metaText = (i) => {
+    const ns = i === active ? names : classes[i].names, t = ns.reduce((s, n) => s + n.count, 0);
+    return ns.length + (ns.length === 1 ? ' name' : ' names') + ' · ' + t + (t === 1 ? ' spin' : ' spins');
+  };
+  function openManager(focusIdx) {
+    mgr.hidden = false; renderManager(); renderClasses();
+    if (typeof focusIdx === 'number') {
+      const inp = $('mgr-name-' + focusIdx);
+      if (inp) { inp.focus(); inp.select(); }
+    }
+  }
+  function closeManager() { mgr.hidden = true; renderClasses(); }
+  function renderManager() {
+    const ul = $('mgr-list');
+    ul.textContent = '';
+    if (mgr.hidden) return;
+    classes.forEach((c, i) => {
+      const li = document.createElement('li');
+      li.className = 'mgr-row' + (i === active ? ' active' : '') + (i === movedIdx ? ' moved' : '');
+      li.dataset.i = i;
+      const mkBtn = (cls, label, icon) => {
+        const b = document.createElement('button');
+        b.type = 'button'; b.className = 'ibtn ' + cls; b.innerHTML = icon; b.setAttribute('aria-label', label); b.title = label;
+        return b;
+      };
+      const grip = mkBtn('grip', 'Drag to reorder ' + (c.name || 'class'), ICON.grip);
+      grip.tabIndex = -1;
+      grip.addEventListener('mousedown', () => { li.draggable = true; });
+      grip.addEventListener('mouseup', () => { li.draggable = false; });
+      const use = mkBtn('use', 'Put ' + (c.name || 'this class') + ' on the wheel', '<span class="radio"></span>');
+      use.setAttribute('aria-pressed', String(i === active));
+      use.addEventListener('click', () => switchClass(i));
+      const input = document.createElement('input');
+      input.type = 'text'; input.className = 'mgr-name'; input.id = 'mgr-name-' + i; input.maxLength = 40;
+      input.value = c.name; input.autocomplete = 'off'; input.setAttribute('aria-label', 'Class name');
+      input.addEventListener('input', () => { c.name = input.value; updateNow(); renderClasses(); save(); });
+      input.addEventListener('blur', () => { if (!input.value.trim()) { input.value = 'Untitled class'; c.name = 'Untitled class'; updateNow(); renderClasses(); save(); } });
+      input.addEventListener('keydown', (e) => { if (e.key === 'Enter') input.blur(); });
+      const up = mkBtn('up', 'Move ' + (c.name || 'class') + ' earlier', ICON.up);
+      const down = mkBtn('down', 'Move ' + (c.name || 'class') + ' later', ICON.down);
+      up.disabled = i === 0; down.disabled = i === classes.length - 1;
+      up.addEventListener('click', () => moveClass(i, i - 1, 'up'));
+      down.addEventListener('click', () => moveClass(i, i + 1, 'down'));
+      const del = mkBtn('del', 'Delete ' + (c.name || 'class'), ICON.del);
+      del.addEventListener('click', () => deleteClassAt(i));
+      const meta = document.createElement('span'); meta.className = 'mgr-meta'; meta.textContent = metaText(i);
+      li.append(grip, use, input, up, down, del, meta);
+      li.addEventListener('dragstart', (e) => { dragFrom = i; li.classList.add('dragging'); if (e.dataTransfer) { e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/plain', String(i)); } });
+      li.addEventListener('dragend', () => { dragFrom = -1; li.draggable = false; ul.querySelectorAll('.mgr-row').forEach((x) => x.classList.remove('dragging', 'over')); });
+      li.addEventListener('dragover', (e) => { if (dragFrom < 0) return; e.preventDefault(); li.classList.add('over'); });
+      li.addEventListener('dragleave', () => li.classList.remove('over'));
+      li.addEventListener('drop', (e) => { e.preventDefault(); const from = dragFrom; dragFrom = -1; moveClass(from, i); });
+      ul.appendChild(li);
+    });
+  }
+  function focusChip(i) { const chips = $('classes').querySelectorAll('.chip:not(.add):not(.manage)'); if (chips[i]) chips[i].focus(); }
   function renderClasses() {
     const box = $('classes');
     box.textContent = '';
     classes.forEach((c, i) => {
       const b = document.createElement('button');
-      b.type = 'button'; b.className = 'chip'; b.draggable = true;
+      b.type = 'button'; b.className = 'chip';
       b.setAttribute('aria-pressed', String(i === active));
-      b.title = 'Click to switch, double-click to rename, drag to reorder';
+      b.title = 'Click to switch, double-click to rename';
       const nm = document.createElement('span'); nm.className = 'cn'; nm.textContent = c.name || 'Untitled class';
       const n = document.createElement('span'); n.className = 'n'; n.textContent = i === active ? names.length : c.names.length;
       b.append(nm, n);
       b.addEventListener('click', () => switchClass(i));
-      b.addEventListener('dblclick', () => { if (!spinning) { if (i !== active) switchClass(i); startRename(); } });
+      b.addEventListener('dblclick', () => { if (!spinning) { if (i !== active) switchClass(i); openManager(i); } });
       b.addEventListener('keydown', (e) => {
         if (e.altKey && (e.key === 'ArrowLeft' || e.key === 'ArrowRight')) {
           e.preventDefault();
@@ -904,11 +1023,6 @@ h1 {
           if (to >= 0 && to < classes.length) { moveClass(i, to); focusChip(to); }
         }
       });
-      b.addEventListener('dragstart', (e) => { dragFrom = i; b.classList.add('dragging'); if (e.dataTransfer) { e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/plain', String(i)); } });
-      b.addEventListener('dragend', () => { dragFrom = -1; box.querySelectorAll('.chip').forEach((x) => x.classList.remove('dragging', 'over')); });
-      b.addEventListener('dragover', (e) => { if (dragFrom < 0) return; e.preventDefault(); b.classList.add('over'); });
-      b.addEventListener('dragleave', () => b.classList.remove('over'));
-      b.addEventListener('drop', (e) => { e.preventDefault(); const from = dragFrom; dragFrom = -1; moveClass(from, i); });
       box.appendChild(b);
     });
     const add = document.createElement('button');
@@ -918,11 +1032,21 @@ h1 {
       if (!classForm.hidden) $('class-new-name').focus();
     });
     box.appendChild(add);
-    $('move-left').disabled = active <= 0;
-    $('move-right').disabled = active >= classes.length - 1;
+    const man = document.createElement('button');
+    man.type = 'button'; man.className = 'chip manage';
+    man.setAttribute('aria-expanded', String(!mgr.hidden));
+    man.innerHTML = ICON.pencil + '<span>Edit classes</span>';
+    man.addEventListener('click', () => { if (mgr.hidden) openManager(); else closeManager(); });
+    box.appendChild(man);
+    mgr.querySelectorAll('.mgr-row').forEach((li) => {
+      const i = +li.dataset.i;
+      if (classes[i]) li.querySelector('.mgr-meta').textContent = metaText(i);
+    });
   }
+  $('mgr-done').addEventListener('click', closeManager);
+
   function renderAll() {
-    classNameInput.value = classes[active].name;
+    renderManager();
     renderList();
     afterChange();
   }
@@ -934,12 +1058,6 @@ h1 {
     renderAll();
     say('idle', 'Now ' + (classes[i].name || 'this class') + '. Try to keep up.');
   }
-  $('move-left').addEventListener('click', () => moveClass(active, active - 1));
-  $('move-right').addEventListener('click', () => moveClass(active, active + 1));
-  classNameInput.addEventListener('input', () => { classes[active].name = classNameInput.value; updateNow(); renderClasses(); save(); });
-  classNameInput.addEventListener('blur', () => { if (!classNameInput.value.trim()) { classNameInput.value = 'Untitled class'; classes[active].name = 'Untitled class'; updateNow(); renderClasses(); save(); } });
-  classNameInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') classNameInput.blur(); });
-
   classForm.addEventListener('submit', (e) => {
     e.preventDefault();
     const name = $('class-new-name').value.trim().slice(0, 40) || 'Class ' + (classes.length + 1);
@@ -955,24 +1073,6 @@ h1 {
     if (!parsed.length) addInput.focus();
   });
   $('class-cancel').addEventListener('click', () => { classForm.hidden = true; });
-
-  $('delete-class').addEventListener('click', () => {
-    if (spinning) return;
-    syncOut();
-    const idx = active, removed = classes[idx];
-    classes.splice(idx, 1);
-    let created = false;
-    if (!classes.length) { classes.push({ name: 'Class 1', names: [], history: [] }); created = true; }
-    active = Math.min(idx, classes.length - 1);
-    names = classes[active].names; history = classes[active].history;
-    renderAll();
-    toast('Deleted ' + (removed.name || 'class') + '.', 'Undo', () => {
-      if (created) classes.splice(0, 1);
-      classes.splice(idx, 0, removed);
-      active = idx; names = removed.names; history = removed.history;
-      renderAll();
-    });
-  });
 
   /* ---------- tabs ---------- */
   function showTab(t) {
