@@ -1,9 +1,4 @@
-<!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Sheela's Wheel of Doom</title>
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><title>Sheela's Wheel of Doom</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns=%22http://www.w3.org/2000/svg%22%20viewBox=%220%200%2064%2064%22%3E%3Ccircle%20cx=%2232%22%20cy=%2234%22%20r=%2230%22%20fill=%22%231b2160%22/%3E%3Cg%20transform=%22translate%280%202%29%22%3E%3Cpath%20d=%22M32%2032%20L32.00%206.00%20A26%2026%200%200%201%2050.38%2013.62%20Z%22%20fill=%22%23ef476f%22/%3E%3Cpath%20d=%22M32%2032%20L50.38%2013.62%20A26%2026%200%200%201%2058.00%2032.00%20Z%22%20fill=%22%23f78c1f%22/%3E%3Cpath%20d=%22M32%2032%20L58.00%2032.00%20A26%2026%200%200%201%2050.38%2050.38%20Z%22%20fill=%22%23ffd23f%22/%3E%3Cpath%20d=%22M32%2032%20L50.38%2050.38%20A26%2026%200%200%201%2032.00%2058.00%20Z%22%20fill=%22%238ac926%22/%3E%3Cpath%20d=%22M32%2032%20L32.00%2058.00%20A26%2026%200%200%201%2013.62%2050.38%20Z%22%20fill=%22%2317b1d4%22/%3E%3Cpath%20d=%22M32%2032%20L13.62%2050.38%20A26%2026%200%200%201%206.00%2032.00%20Z%22%20fill=%22%233a86ff%22/%3E%3Cpath%20d=%22M32%2032%20L6.00%2032.00%20A26%2026%200%200%201%2013.62%2013.62%20Z%22%20fill=%22%235b4bdb%22/%3E%3Cpath%20d=%22M32%2032%20L13.62%2013.62%20A26%2026%200%200%201%2032.00%206.00%20Z%22%20fill=%22%239b5de5%22/%3E%3C/g%3E%3Ccircle%20cx=%2232%22%20cy=%2234%22%20r=%228%22%20fill=%22%23ffd23f%22%20stroke=%22%231b2160%22%20stroke-width=%223%22/%3E%3Cpath%20d=%22M32%2017%20L24%202%20H40%20Z%22%20fill=%22%23ff3d71%22%20stroke=%22%23fff%22%20stroke-width=%222%22%20stroke-linejoin=%22round%22/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -427,9 +422,7 @@ h1 {
 }
 </style>
 
-</head>
-<body>
-<main class="app">
+</head><body><main class="app">
   <header class="top">
     <div class="top-text">
       <h1>Sheela's Wheel of Doom</h1>
@@ -1085,6 +1078,7 @@ h1 {
     const a = (((1.5 * Math.PI - th) % TAU) + TAU) % TAU;
     return Math.min(n - 1, Math.floor(a / (TAU / n)));
   }
+  const LOW_ODDS = ['sammy', 'orion', 'kangmin'];
   function spin() {
     if (spinning || !names.length || !reveal.hidden) return;
     ensureAudio();
@@ -1093,9 +1087,17 @@ h1 {
     stage.classList.add('spinning'); panel.classList.add('locked'); panel.inert = true; hub.disabled = true;
     updateStatus('Spinning…');
     clearTimeout(idleTimer); say('spinning', pick(SPIN_LINES));
-    const extra = (3.5 + Math.random() * 1.5) * TAU + Math.random() * TAU;
-    const dur = reduceMq.matches ? 900 : 1800 + Math.random() * 500;
     const t0 = performance.now(), th0 = theta;
+    // Weighted pick: Sammy, Orion and Kangmin are slightly less likely (70% weight).
+    const n = names.length;
+    const weights = names.map(x => LOW_ODDS.indexOf(String(x.text).trim().toLowerCase()) >= 0 ? 0.7 : 1);
+    let r = Math.random() * weights.reduce((a, b) => a + b, 0), target = n - 1;
+    for (let i = 0; i < n; i++) { r -= weights[i]; if (r <= 0) { target = i; break; } }
+    const aT = (target + 0.15 + Math.random() * 0.7) * (TAU / n);
+    const thFinal = 1.5 * Math.PI - aT;
+    const delta = (((thFinal - th0) % TAU) + TAU) % TAU;
+    const extra = delta + (3 + Math.floor(Math.random() * 2)) * TAU;
+    const dur = reduceMq.matches ? 900 : 1800 + Math.random() * 500;
     let last = indexAt(theta);
     const step = (now) => {
       const t = Math.min(1, (now - t0) / dur);
@@ -1285,6 +1287,4 @@ h1 {
   }
 })();
 </script>
-
-</body>
-</html>
+</body></html>
