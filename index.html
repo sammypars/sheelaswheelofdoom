@@ -77,7 +77,7 @@ h1 {
 .top p { margin: 0; color: var(--muted); max-width: 62ch; }
 
 /* Teacher */
-.teacher { margin: 0; position: relative; width: 220px; flex: none; margin-top: 12px; }
+.teacher { margin: 0; position: relative; width: 320px; flex: none; margin-top: 0; }
 .portrait {
   position: relative; border: 7px solid #8a5a33; border-radius: 14px; background: #1f4d3a;
   box-shadow: 0 0 0 2px #5a3a1f, 0 0 26px rgba(255, 40, 70, 0.55), 0 8px 16px rgba(8, 10, 40, 0.35);
@@ -412,8 +412,8 @@ h1 {
   .list { max-height: 340px; }
 }
 @media (max-width: 560px) {
-  .teacher { width: 150px; margin-top: 14px; margin-left: auto; }
-  .bubble { bottom: 78%; max-width: 52vw; font-size: 0.8rem; }
+  .teacher { width: 220px; margin-top: 64px; margin-left: auto; }
+  .bubble { right: 0; bottom: 100%; margin: 0 0 12px; max-width: calc(100vw - 40px); font-size: 0.82rem; border-radius: 14px 14px 4px 14px; }
 }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; }
@@ -541,12 +541,19 @@ h1 {
     toastEl = $('toast'), confettiCv = $('confetti'), classForm = $('class-form');
   const teacher = $('teacher'), bubble = $('bubble');
 
-  const SPIN_LINES = ['Somebody did not do the reading.', 'Eyes on the wheel.', 'Hmm. Somebody looks unprepared.', 'No talking while it spins.'];
+  const SPIN_LINES = ['Somebody did not do the reading.', 'Eyes on the wheel.', 'Hmm. Somebody looks unprepared.', 'No talking while it spins.', 'Round and round it goes.', 'Do not look away.', 'I almost feel bad. Almost.', 'Pray it is not you.', 'Hope is not a study strategy.', 'The suspense is part of the lesson.'];
   const IDLE_LINES = ['Late work is not accepted here.', 'Sit up straight. Spin the wheel.', 'I do not repeat myself. Spin.',
     'Did you do the reading? Of course not.', 'Your doom awaits.', 'Pencils up. Phones away.', 'This will be on the test.',
     'I have all year. Spin.', 'Somebody is about to be called on.', 'No cheat sheets. I check.',
     'History repeats itself. So will your name.', 'Detention is always an option.', 'Bold of you to make eye contact.',
-    'Today, somebody presents first.', 'Do not bother raising your hand.'];
+    'Today, somebody presents first.', 'Do not bother raising your hand.',
+    'Obeissez.', 'The Bastille fell. So can your grade.', 'Napoleon had a short temper. I do not.', 'Open your textbook. Page one.',
+    'I grade on a curve. Downward.', 'Your excuses are noted. And ignored.', 'Rome fell because of students like you.',
+    'There is a quiz tomorrow. There is always a quiz tomorrow.', 'Write that down. It is on the exam.',
+    'Who wants to go first? Nobody? The wheel decides.', 'I can hear you whispering.', 'Your phone is mine now.',
+    'Study hard. It will not help.', 'Every empire falls. Yours starts now.', 'I remember every name. Especially yours.',
+    'Do not look at the floor. Look at me.', 'The wheel has chosen. You have not.', 'Homework due yesterday. Spin.',
+    'Silence. I am thinking of a victim.', 'Dates, names, causes. Know them all.'];
   let lastIdle = '';
   function nextIdle() { let l; do { l = IDLE_LINES[(Math.random() * IDLE_LINES.length) | 0]; } while (l === lastIdle); lastIdle = l; return l; }
   let idleTimer = 0;
