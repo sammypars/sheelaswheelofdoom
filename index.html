@@ -1094,7 +1094,7 @@ h1 {
   });
 
   /* ---------- spinning ---------- */
-  const easeOut = (t) => 1 - Math.pow(1 - t, 4);
+  const easeOut = (t) => 1 - Math.pow(1 - t, 3);
   function indexAt(th) {
     const n = names.length;
     const a = (((1.5 * Math.PI - th) % TAU) + TAU) % TAU;
@@ -1108,8 +1108,8 @@ h1 {
     stage.classList.add('spinning'); panel.classList.add('locked'); panel.inert = true; hub.disabled = true;
     updateStatus('Spinning…');
     clearTimeout(idleTimer); say('spinning', pick(SPIN_LINES));
-    const extra = (4 + Math.random() * 2) * TAU + Math.random() * TAU;
-    const dur = reduceMq.matches ? 1200 : 2600 + Math.random() * 800;
+    const extra = (3.5 + Math.random() * 1.5) * TAU + Math.random() * TAU;
+    const dur = reduceMq.matches ? 900 : 1800 + Math.random() * 500;
     const t0 = performance.now(), th0 = theta;
     let last = indexAt(theta);
     const step = (now) => {
@@ -1143,7 +1143,7 @@ h1 {
     updateStatus(w.text + ' was picked.');
     say('win', w.count >= 3 ? w.text + ' AGAIN? Bold of you.' : w.text + ', to the board. Now.');
     clearTimeout(idleTimer); idleTimer = setTimeout(goIdle, 9000);
-    winSound(); burst(); setTimeout(() => openReveal(w, color), reduceMq.matches ? 0 : 350);
+    winSound(); burst(); setTimeout(() => openReveal(w, color), reduceMq.matches ? 0 : 250);
   }
 
   /* ---------- reveal ---------- */
