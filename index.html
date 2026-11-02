@@ -223,9 +223,14 @@ h1 {
 .class-form textarea { resize: vertical; min-height: 84px; }
 .form-actions { display: flex; gap: 8px; }
 
-.class-edit { display: flex; align-items: center; gap: 8px; }
+.class-edit { display: flex; align-items: center; gap: 6px; }
+.edit-ico { flex: none; color: var(--muted); }
+.btn.icon { display: grid; place-items: center; padding: 6px 8px; }
+.btn:disabled { opacity: 0.4; cursor: default; translate: none; }
+.chip.dragging { opacity: 0.4; }
+.chip.over { outline: 2px dashed var(--focus); outline-offset: 2px; }
 .class-edit input {
-  flex: 1; min-width: 0; padding: 4px 8px; margin-left: -8px; border-radius: 8px;
+  flex: 1; min-width: 0; padding: 4px 8px; margin-left: -2px; border-radius: 8px;
   border: 1px solid transparent; background: transparent;
   font-family: var(--f-display); font-weight: 700; font-size: 1.4rem; letter-spacing: -0.01em;
 }
@@ -444,6 +449,7 @@ h1 {
 
   <aside class="panel" id="panel" aria-label="Classes, names and tally">
     <div class="classes" id="classes" role="group" aria-label="Classes"></div>
+    <p class="note" id="class-hint">Drag a class to reorder it, or double-click it to rename. Alt + arrow keys also move the selected class.</p>
 
     <form class="class-form" id="class-form" autocomplete="off" hidden>
       <label for="class-new-name">New class name</label>
@@ -457,9 +463,12 @@ h1 {
     </form>
 
     <div class="class-edit">
-      <label class="sr-only" for="class-name">Class name</label>
-      <input id="class-name" type="text" maxlength="40" autocomplete="off">
-      <button class="btn small ghost danger" id="delete-class" type="button">Delete class</button>
+      <label class="sr-only" for="class-name">Class name (edit to rename)</label>
+      <svg class="edit-ico" viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16v4zM13.5 6.5l4 4" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></svg>
+      <input id="class-name" type="text" maxlength="40" autocomplete="off" title="Click to rename this class">
+      <button class="btn small icon" id="move-left" type="button" aria-label="Move class earlier" title="Move earlier"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <button class="btn small icon" id="move-right" type="button" aria-label="Move class later" title="Move later"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <button class="btn small ghost danger" id="delete-class" type="button">Delete</button>
     </div>
 
     <div class="tabs" role="tablist" aria-label="Panel view">
@@ -862,17 +871,44 @@ h1 {
   }
 
   /* ---------- classes ---------- */
+  let dragFrom = -1;
+  function moveClass(from, to) {
+    if (spinning || from === to || to < 0 || to >= classes.length) return;
+    syncOut();
+    const moved = classes.splice(from, 1)[0];
+    classes.splice(to, 0, moved);
+    if (active === from) active = to;
+    else if (from < active && to >= active) active -= 1;
+    else if (from > active && to <= active) active += 1;
+    renderClasses(); save();
+  }
+  function focusChip(i) { const chips = $('classes').querySelectorAll('.chip:not(.add)'); if (chips[i]) chips[i].focus(); }
+  function startRename() { classNameInput.focus(); classNameInput.select(); }
   function renderClasses() {
     const box = $('classes');
     box.textContent = '';
     classes.forEach((c, i) => {
       const b = document.createElement('button');
-      b.type = 'button'; b.className = 'chip';
+      b.type = 'button'; b.className = 'chip'; b.draggable = true;
       b.setAttribute('aria-pressed', String(i === active));
+      b.title = 'Click to switch, double-click to rename, drag to reorder';
       const nm = document.createElement('span'); nm.className = 'cn'; nm.textContent = c.name || 'Untitled class';
       const n = document.createElement('span'); n.className = 'n'; n.textContent = i === active ? names.length : c.names.length;
       b.append(nm, n);
       b.addEventListener('click', () => switchClass(i));
+      b.addEventListener('dblclick', () => { if (!spinning) { if (i !== active) switchClass(i); startRename(); } });
+      b.addEventListener('keydown', (e) => {
+        if (e.altKey && (e.key === 'ArrowLeft' || e.key === 'ArrowRight')) {
+          e.preventDefault();
+          const to = i + (e.key === 'ArrowLeft' ? -1 : 1);
+          if (to >= 0 && to < classes.length) { moveClass(i, to); focusChip(to); }
+        }
+      });
+      b.addEventListener('dragstart', (e) => { dragFrom = i; b.classList.add('dragging'); if (e.dataTransfer) { e.dataTransfer.effectAllowed = 'move'; e.dataTransfer.setData('text/plain', String(i)); } });
+      b.addEventListener('dragend', () => { dragFrom = -1; box.querySelectorAll('.chip').forEach((x) => x.classList.remove('dragging', 'over')); });
+      b.addEventListener('dragover', (e) => { if (dragFrom < 0) return; e.preventDefault(); b.classList.add('over'); });
+      b.addEventListener('dragleave', () => b.classList.remove('over'));
+      b.addEventListener('drop', (e) => { e.preventDefault(); const from = dragFrom; dragFrom = -1; moveClass(from, i); });
       box.appendChild(b);
     });
     const add = document.createElement('button');
@@ -882,6 +918,8 @@ h1 {
       if (!classForm.hidden) $('class-new-name').focus();
     });
     box.appendChild(add);
+    $('move-left').disabled = active <= 0;
+    $('move-right').disabled = active >= classes.length - 1;
   }
   function renderAll() {
     classNameInput.value = classes[active].name;
@@ -896,6 +934,8 @@ h1 {
     renderAll();
     say('idle', 'Now ' + (classes[i].name || 'this class') + '. Try to keep up.');
   }
+  $('move-left').addEventListener('click', () => moveClass(active, active - 1));
+  $('move-right').addEventListener('click', () => moveClass(active, active + 1));
   classNameInput.addEventListener('input', () => { classes[active].name = classNameInput.value; updateNow(); renderClasses(); save(); });
   classNameInput.addEventListener('blur', () => { if (!classNameInput.value.trim()) { classNameInput.value = 'Untitled class'; classes[active].name = 'Untitled class'; updateNow(); renderClasses(); save(); } });
   classNameInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') classNameInput.blur(); });
@@ -968,8 +1008,8 @@ h1 {
     stage.classList.add('spinning'); panel.classList.add('locked'); panel.inert = true; hub.disabled = true;
     updateStatus('Spinning…');
     clearTimeout(idleTimer); say('spinning', pick(SPIN_LINES));
-    const extra = (5 + Math.random() * 3) * TAU + Math.random() * TAU;
-    const dur = reduceMq.matches ? 1400 : 5200 + Math.random() * 1800;
+    const extra = (4 + Math.random() * 2) * TAU + Math.random() * TAU;
+    const dur = reduceMq.matches ? 1200 : 2600 + Math.random() * 800;
     const t0 = performance.now(), th0 = theta;
     let last = indexAt(theta);
     const step = (now) => {
@@ -1003,7 +1043,7 @@ h1 {
     updateStatus(w.text + ' was picked.');
     say('win', w.count >= 3 ? w.text + ' AGAIN? Bold of you.' : w.text + ', to the board. Now.');
     clearTimeout(idleTimer); idleTimer = setTimeout(goIdle, 9000);
-    winSound(); burst(); setTimeout(() => openReveal(w, color), reduceMq.matches ? 0 : 500);
+    winSound(); burst(); setTimeout(() => openReveal(w, color), reduceMq.matches ? 0 : 350);
   }
 
   /* ---------- reveal ---------- */
