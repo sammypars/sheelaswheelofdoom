@@ -436,15 +436,15 @@ h1 {
       <p>Pick a class on the right, then click the wheel, press SPIN, or hit Space. Every landing is counted per class.</p>
     </div>
     <figure class="teacher" id="teacher" data-mood="idle">
-      <p class="bubble" id="bubble" aria-live="polite">Sit up straight. Spin the wheel.</p>
-      <svg viewBox="0 0 220 230" role="img" aria-label="Cartoon of a stern history teacher with glasses and a hair bun, standing in front of a chalkboard">
+      <p class="bubble" id="bubble">Sit up straight. Spin the wheel.</p>
+      <svg viewBox="0 0 220 230" role="img" aria-label="Cartoon of a menacing history teacher with glasses, small horns, glowing red eyes and a wicked grin, standing in front of a chalkboard">
         <rect x="6" y="6" width="208" height="150" rx="8" fill="#8a5a33"/>
         <rect x="14" y="14" width="192" height="134" rx="4" fill="#1f4d3a"/>
         <text x="110" y="46" text-anchor="middle" font-family="Bricolage Grotesque, sans-serif" font-weight="800" font-size="22" fill="#f4f1e6" letter-spacing="2">POP QUIZ</text>
         <text x="28" y="76" font-family="Bricolage Grotesque, sans-serif" font-weight="600" font-size="13" fill="#d9e6d2">1066</text>
         <text x="28" y="96" font-family="Bricolage Grotesque, sans-serif" font-weight="600" font-size="13" fill="#d9e6d2">1492</text>
         <text x="28" y="116" font-family="Bricolage Grotesque, sans-serif" font-weight="600" font-size="13" fill="#d9e6d2">1776</text>
-        <path d="M24 134 H60" stroke="#d9e6d2" stroke-width="2" stroke-linecap="round" opacity=".6"/>
+        <text x="110" y="138" text-anchor="middle" font-family="Bricolage Grotesque, sans-serif" font-weight="800" font-size="12" fill="#ff8a8a" letter-spacing="3">OR ELSE.</text>
         <path d="M178 92 l8 8 m0 -8 l-8 8" stroke="#ff8a8a" stroke-width="3" stroke-linecap="round"/>
         <rect x="14" y="148" width="192" height="8" fill="#8a5a33"/>
         <g class="stick"><line x1="188" y1="226" x2="150" y2="104" stroke="#c98b4f" stroke-width="5" stroke-linecap="round"/><circle cx="150" cy="104" r="4" fill="#a96d36"/></g>
@@ -457,13 +457,16 @@ h1 {
         <circle cx="110" cy="58" r="17" fill="#7c7c8c"/>
         <path d="M68 112 C62 62 90 62 110 62 C130 62 158 62 152 112 C146 92 134 80 110 80 C86 80 74 92 68 112 Z" fill="#7c7c8c"/>
         <path d="M96 56 C104 52 116 52 124 56" stroke="#5f5f6e" stroke-width="2" fill="none" stroke-linecap="round"/>
-        <g class="brows"><path d="M82 100 L102 108" stroke="#3b3b4a" stroke-width="4.5" stroke-linecap="round"/><path d="M138 100 L118 108" stroke="#3b3b4a" stroke-width="4.5" stroke-linecap="round"/></g>
-        <g class="eyes"><circle cx="92" cy="118" r="3.6" fill="#12163a"/><circle cx="128" cy="118" r="3.6" fill="#12163a"/></g>
+        <path d="M84 66 C70 54 70 38 80 30 C82 44 90 54 98 60 Z" fill="#9b1c31" stroke="#5e0f1d" stroke-width="1.5" stroke-linejoin="round"/>
+        <path d="M136 66 C150 54 150 38 140 30 C138 44 130 54 122 60 Z" fill="#9b1c31" stroke="#5e0f1d" stroke-width="1.5" stroke-linejoin="round"/>
+        <g class="brows"><path d="M76 94 L104 111" stroke="#2a2a38" stroke-width="5.5" stroke-linecap="round"/><path d="M144 94 L116 111" stroke="#2a2a38" stroke-width="5.5" stroke-linecap="round"/></g>
+        <g class="eyes"><circle cx="92" cy="119" r="9" fill="#ff2a2a" opacity=".35"/><circle cx="128" cy="119" r="9" fill="#ff2a2a" opacity=".35"/><circle cx="92" cy="119" r="4" fill="#ff2a2a"/><circle cx="128" cy="119" r="4" fill="#ff2a2a"/><circle cx="92" cy="119" r="1.4" fill="#12163a"/><circle cx="128" cy="119" r="1.4" fill="#12163a"/></g>
         <g fill="none" stroke="#12163a" stroke-width="3"><rect x="76" y="107" width="32" height="24" rx="8"/><rect x="112" y="107" width="32" height="24" rx="8"/><path d="M108 116 H112"/></g>
         <path d="M76 116 C66 114 64 120 62 138" stroke="#12163a" stroke-width="1.6" fill="none" opacity=".6"/>
         <path d="M110 126 L106 140 H114" stroke="#c98d68" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
-        <path class="mouth-frown" d="M94 156 C102 148 118 148 126 156" stroke="#8a2a3a" stroke-width="4" fill="none" stroke-linecap="round"/>
-        <ellipse class="mouth-open" cx="110" cy="154" rx="12" ry="9" fill="#7a1f2e"/>
+        <path class="mouth-frown" d="M88 150 C98 168 122 168 132 150" stroke="#6a1425" stroke-width="4" fill="none" stroke-linecap="round"/>
+        <ellipse class="mouth-open" cx="110" cy="157" rx="15" ry="11" fill="#5e0f1d"/>
+        <path class="fangs" d="M95 157 L103 161 L98 168 Z M125 157 L117 161 L122 168 Z" fill="#fff" stroke="#12163a" stroke-width="1" stroke-linejoin="round"/>
         <path d="M84 140 l6 2 m-6 4 l7 1 M136 142 l6 -2 m-7 6 l7 -1" stroke="#c98d68" stroke-width="1.8" stroke-linecap="round"/>
       </svg>
     </figure>
@@ -574,7 +577,13 @@ h1 {
   const teacher = $('teacher'), bubble = $('bubble');
 
   const SPIN_LINES = ['Somebody did not do the reading.', 'Eyes on the wheel.', 'Hmm. Somebody looks unprepared.', 'No talking while it spins.'];
-  const IDLE_LINES = ['Sit up straight. Spin the wheel.', 'Late work is not accepted here.', 'I do not repeat myself. Spin.'];
+  const IDLE_LINES = ['Late work is not accepted here.', 'Sit up straight. Spin the wheel.', 'I do not repeat myself. Spin.',
+    'Did you do the reading? Of course not.', 'Your doom awaits.', 'Pencils up. Phones away.', 'This will be on the test.',
+    'I have all year. Spin.', 'Somebody is about to be called on.', 'No cheat sheets. I check.',
+    'History repeats itself. So will your name.', 'Detention is always an option.', 'Bold of you to make eye contact.',
+    'Today, somebody presents first.', 'Do not bother raising your hand.'];
+  let lastIdle = '';
+  function nextIdle() { let l; do { l = IDLE_LINES[(Math.random() * IDLE_LINES.length) | 0]; } while (l === lastIdle); lastIdle = l; return l; }
   let idleTimer = 0;
   function say(mood, msg) {
     teacher.dataset.mood = mood;
@@ -582,7 +591,7 @@ h1 {
     bubble.style.animation = 'none'; void bubble.offsetWidth; bubble.style.animation = '';
   }
   const pick = (a) => a[(Math.random() * a.length) | 0];
-  function goIdle() { say('idle', names.length ? pick(IDLE_LINES) : 'No names? Detention for everyone.'); }
+  function goIdle() { say('idle', names.length ? nextIdle() : 'No names? Detention for everyone.'); }
 
   let uid = 0;
   const mk = (text, count) => ({ id: 'n' + (++uid), text: text, count: count || 0 });
@@ -1277,6 +1286,7 @@ h1 {
   });
 
   /* ---------- boot ---------- */
+  setInterval(() => { if (teacher.dataset.mood === 'idle' && !spinning && reveal.hidden && !document.hidden) goIdle(); }, 6000);
   load();
   names = classes[active].names; history = classes[active].history;
   removeToggle.checked = opts.removeWinner; soundToggle.checked = opts.sound;
